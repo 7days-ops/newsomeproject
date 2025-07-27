@@ -1,0 +1,44 @@
+name: Go CI/CD
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:  # 👈 позволяет запускать вручную с GitHub UI
+
+jobs:
+  build-and-test:
+    name: CI — Build and Test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v3
+
+      - name: 🐹 Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.22'
+
+      - name: 🧰 Install dependencies
+        run: go mod tidy
+
+      - name: ✅ Run tests
+        run: go test -v ./...
+
+  docker-build:
+    name: CD — Docker Build
+    runs-on: ubuntu-latest
+    needs: build-and-test  # 👈 Запускается только если CI успешен
+
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v3
+
+      - name: 🐳 Build Docker image
+        run: docker build -t my-go-app:latest .
+
+      - name: Run container
+        run: docker run -rm my-go-app:latest
+
