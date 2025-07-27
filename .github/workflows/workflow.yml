@@ -40,5 +40,5 @@ jobs:
         run: docker build -t my-go-app:latest .
 
       - name: Run container
-        run: docker run -rm my-go-app:latest
+        run: docker run --rm my-go-app:latest
 
